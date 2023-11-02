@@ -204,6 +204,7 @@ def get_llmtime_predictions_data(train, test, model, settings, num_samples=10, t
             train[i] = pd.Series(train[i], index=pd.RangeIndex(len(train[i])))
             test[i] = pd.Series(test[i], index=pd.RangeIndex(len(train[i]), len(test[i])+len(train[i])))
 
+    
     test_len = len(test[0])
     assert all(len(t)==test_len for t in test), f'All test series must have same length, got {[len(t) for t in test]}'
 
@@ -213,11 +214,16 @@ def get_llmtime_predictions_data(train, test, model, settings, num_samples=10, t
     # transform input_arrs
     input_arrs = [train[i].values for i in range(len(train))]
     transformed_input_arrs = np.array([scaler.transform(input_array) for input_array, scaler in zip(input_arrs, scalers)])
+    
+    # transformed_input_arrs = np.array([scaler.transform(input_array)*0.7 for input_array, scaler in zip(input_arrs, scalers)])
+
     # serialize input_arrs
     input_strs = [serialize_arr(scaled_input_arr, settings) for scaled_input_arr in transformed_input_arrs]
     # Truncate input_arrs to fit the maximum context length
     input_arrs, input_strs = zip(*[truncate_input(input_array, input_str, settings, model, test_len) for input_array, input_str in zip(input_arrs, input_strs)])
     
+    print("train: ...", input_arrs[0][-20:])
+    print("test: ...", test[0][:20])
     steps = test_len
     samples = None
     medians = None
