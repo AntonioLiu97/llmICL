@@ -1,31 +1,18 @@
-import os
-import random
 import torch
-import glob
-import itertools
-import pandas as pd
 import numpy as np
 from jax import grad,vmap
 from tqdm.notebook import tqdm
-import argparse
-from pathlib import Path
-import transformers
+
 from transformers import (
     LlamaForCausalLM, 
-    LlamaTokenizer, 
-    LlamaConfig,
-    LogitsProcessorList
+    LlamaTokenizer
 )
-from data.serialize import serialize_arr, deserialize_str, SerializerSettings
-
-import pickle
-import matplotlib.pyplot as plt
-import pandas as pd
-from data.small_context import get_datasets
+from data.serialize import serialize_arr, SerializerSettings
 
 DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"
 DEFAULT_UNK_TOKEN = "<unk>"
+
 
 def llama2_model_string(model_size, chat):
     chat = "chat-" if chat else ""
@@ -95,6 +82,9 @@ def llama_nll_fn(model, input_arr, target_arr, settings:SerializerSettings, tran
 
     input_str = serialize_arr(vmap(transform)(input_arr), settings)
     target_str = serialize_arr(vmap(transform)(target_arr), settings)
+    
+    print("train_str: ...", input_str[-20:])
+    print("test_str: ...", target_str[:20])
     full_series = input_str + target_str
     
     batch = tokenizer(
@@ -111,6 +101,7 @@ def llama_nll_fn(model, input_arr, target_arr, settings:SerializerSettings, tran
     good_tokens = [tokenizer.convert_tokens_to_ids(token) for token in good_tokens_str]
     bad_tokens = [i for i in range(len(tokenizer)) if i not in good_tokens]
     out['logits'][:,:,bad_tokens] = -100
+    # why not set to -inf?
 
     input_ids = batch['input_ids'][0][1:]
     logprobs = torch.nn.functional.log_softmax(out['logits'], dim=-1)[0][:-1]
