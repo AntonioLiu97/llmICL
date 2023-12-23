@@ -339,7 +339,39 @@ class MultiResolutionPDF:
     def check_gap_n_overlap(self):
         assert np.allclose(self.bin_center_arr[1:] - self.bin_width_arr[1:]/2, 
                            self.bin_center_arr[:-1] + self.bin_width_arr[:-1]/2), "bin overlap detected"
-                
+        
+    def discretize(self, func, mode = 'bin_center'):
+        """
+        Args:
+            func: a function supported on self.bin_center_arr.
+                  should be implmented using numpy operations for parallelization
+            mode: 'bin_center': approximate probability of bin using its center
+                  'intgt': integrate over bin using scipy quad
+        Populate bin height by dicretizng
+        """
+        if mode == 'bin_center':
+            self.bin_height_arr = func(self.bin_center_arr)
+        elif mode == 'intgt':
+            raise NotImplementedError 
+        self.normalize()
+        
+    def BT_dist(self, Multi_PDF):
+        """
+        Calculate the Bhattacharyya distance with another Multi_PDF object
+        """          
+        assert np.all(self.bin_center_arr == Multi_PDF.bin_center_arr), "Only PDFs of the same discretization are comparable"
+        weighted_PQ_arr = np.sqrt(self.bin_height_arr * Multi_PDF.bin_height_arr) * self.bin_width_arr
+        return -np.log(np.sum(weighted_PQ_arr))
+    
+    def KL_div(self, Multi_PDF):
+        """
+        Calculate the KL divergence D_KL(self||Multi_PDF)
+        """          
+        assert np.all(self.bin_center_arr == Multi_PDF.bin_center_arr), "Only PDFs of the same discretization are comparable"
+        log_ratio = np.log(self.bin_height_arr) - np.log(Multi_PDF.bin_height_arr)
+        weighted_log_ratio = log_ratio * self.bin_height_arr * self.bin_width_arr
+        return np.sum(weighted_log_ratio)
+        
     def plot(self, ax=None, log_scale=False):
         """
         Plots the PDF as a bar chart.
