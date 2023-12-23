@@ -7,7 +7,7 @@ from transformers import (
     LlamaForCausalLM, 
     LlamaTokenizer
 )
-from data.serialize import serialize_arr, SerializerSettings
+from utils.serialize import serialize_arr, SerializerSettings
 
 DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"

@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from data.serialize import SerializerSettings
+from utils.serialize import SerializerSettings
 from models.llmtime import get_llmtime_predictions_data
 
 

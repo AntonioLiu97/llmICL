@@ -8,11 +8,6 @@ pip install tiktoken
 pip install tqdm
 pip install matplotlib
 pip install "pandas<2.0.0"
-pip install darts
-pip install gpytorch
 pip install transformers
-pip install datasets
 pip install multiprocess
 # conda deactivate llmtime
-
-# openAI_Key: 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

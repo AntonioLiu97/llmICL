@@ -8,7 +8,7 @@ from datetime import datetime
 import openai
 openai.api_key = os.environ['OPENAI_API_KEY']
 # openai.api_key = "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"
-from data.serialize import SerializerSettings
+from utils.serialize import SerializerSettings
 from models.utils import grid_iter
 from models.llmtime import get_llmtime_predictions_data
 from models.validation_likelihood_tuning import get_autotuned_predictions_data
