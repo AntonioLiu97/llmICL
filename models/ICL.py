@@ -355,7 +355,7 @@ class MultiResolutionPDF:
             right_edge = self.bin_center_arr + self.bin_width_arr/2
             left_edge = self.bin_center_arr - self.bin_width_arr/2
             prob_arr = func(right_edge) - func(left_edge)
-            self.bin_height_arr = prob_arr / self.bin_center_arr
+            self.bin_height_arr = prob_arr / self.bin_width_arr
         self.normalize()
         
     def BT_dist(self, Multi_PDF):
