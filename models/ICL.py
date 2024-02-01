@@ -2,6 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
+# colors = {1: 'dodgerblue', 0.1: 'violet', 0.01: 'hotpink'}
+colors = {1: 'lightseagreen', 0.1: 'dodgerblue', 0.01: 'blue'}
+# colors = {1: 'dodgerblue', 0.1: 'dodgerblue', 0.01: 'dodgerblue'}
+def closest_color(width, colors):
+    return colors[min(colors.keys(), key=lambda k: abs(k-width))]
+
 def recursive_refiner(PDF, seq, curr = -3, refine_depth = -2, main = True, mode = "neighbor"
                 ,model = None, tokenizer = None, good_tokens=None, kv_cache = None):
     """
@@ -21,7 +27,7 @@ def recursive_refiner(PDF, seq, curr = -3, refine_depth = -2, main = True, mode 
     None
     """
     if curr == refine_depth:
-        print("nothing to refine, terminate refiner")
+        # print("nothing to refine, terminate refiner")
         return
     if main:
         main_digit = seq[curr]
@@ -245,6 +251,42 @@ class MultiResolutionPDF:
             assert np.all(np.diff(self.bin_center_arr) >= 0), "final array should be sorted"
             self.check_gap_n_overlap()
             self.normalize()
+            
+    def coarsen(self, coarse_bin_centers, coarse_bin_widths):
+        """
+        Replace fine bins using coarse ones. This is for plotting purposes only.
+
+        Args:
+            coarse_bin_centers (np.ndarray): The centers of the coarse bins.
+            coarse_bin_widths (np.ndarray): The widths of the coarse bins.
+        """
+        for coarse_bin_center, coarse_bin_width in zip(coarse_bin_centers, coarse_bin_widths):
+            # Find the indices of the fine bins that fall within the coarse bin
+            indices = np.where((self.bin_center_arr >= coarse_bin_center - coarse_bin_width / 2) &
+                            (self.bin_center_arr <= coarse_bin_center + coarse_bin_width / 2))[0]
+
+            if len(indices) == 0:
+                continue
+
+            # Compute the total height of the fine bins
+            total_height = np.sum(self.bin_height_arr[indices] * self.bin_width_arr[indices])
+
+            # Replace the fine bins with the coarse bin
+            self.bin_center_arr = np.delete(self.bin_center_arr, indices)
+            self.bin_width_arr = np.delete(self.bin_width_arr, indices)
+            self.bin_height_arr = np.delete(self.bin_height_arr, indices)
+
+            self.bin_center_arr = np.append(self.bin_center_arr, coarse_bin_center)
+            self.bin_width_arr = np.append(self.bin_width_arr, coarse_bin_width)
+            self.bin_height_arr = np.append(self.bin_height_arr, total_height / coarse_bin_width)
+
+        # Sort the bins by their centers
+        sort_indices = np.argsort(self.bin_center_arr)
+        self.bin_center_arr = self.bin_center_arr[sort_indices]
+        self.bin_width_arr = self.bin_width_arr[sort_indices]
+        self.bin_height_arr = self.bin_height_arr[sort_indices]
+        
+    
     
     def load_from_num_prob(self, num_slice, prob_slice):
         """
@@ -376,7 +418,7 @@ class MultiResolutionPDF:
         weighted_log_ratio = log_ratio * self.bin_height_arr * self.bin_width_arr
         return np.sum(weighted_log_ratio)
         
-    def plot(self, ax=None, log_scale=False):
+    def plot(self, ax=None, log_scale=False, statistic = True):
         """
         Plots the PDF as a bar chart.
 
@@ -387,12 +429,21 @@ class MultiResolutionPDF:
         if ax is None:
             fig, ax = plt.subplots(figsize=(16, 4), dpi=100)
 
-        ax.bar(self.bin_center_arr, self.bin_height_arr, width=self.bin_width_arr, align='center', color='black', alpha=0.5)
-        ax.vlines(self.mean, 0, np.max(self.bin_height_arr), color='blue', label='Mean', lw=2)
-        ax.vlines(self.mode, 0, np.max(self.bin_height_arr), color='lightblue', label='Mode', lw=2)
+        # ax.bar(self.bin_center_arr, self.bin_height_arr, width=self.bin_width_arr, align='center', color='black', alpha=0.5)
+        # Define colors for different bin widths
+
         
-        # Visualize sigma as horizontal lines
-        ax.hlines(y=np.max(self.bin_height_arr), xmin=self.mean - self.sigma, xmax=self.mean + self.sigma, color='g', label='Sigma', lw=2)
+        # Iterate over bins and plot with corresponding color
+        for center, width, height in zip(self.bin_center_arr, self.bin_width_arr, self.bin_height_arr):
+            color = closest_color(width, colors)
+            ax.bar(center, height, width=width, align='center', color=color, alpha=1)
+        
+        
+        if statistic:
+            ax.vlines(self.mean, 0, np.max(self.bin_height_arr), color='blue', label='Mean', lw=2)
+            ax.vlines(self.mode, 0, np.max(self.bin_height_arr), color='lightblue', label='Mode', lw=2)
+            # Visualize sigma as horizontal lines
+            ax.hlines(y=np.max(self.bin_height_arr), xmin=self.mean - self.sigma, xmax=self.mean + self.sigma, color='g', label='Sigma', lw=2)
 
         if log_scale:
             ax.set_yscale('log')
@@ -408,24 +459,3 @@ class MultiResolutionPDF:
             if center - width / 2 <= x <= center + width / 2:
                 return height
         return 0
-
-# # Example usage
-# pdf = MultiResolutionPDF()
-# # pdf.add_bin(center_arr =np.array([0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5]), 
-# #             width_arr =np.array([1]*10), 
-# #             height_arr =np.array([0.1]*10)
-# #             # height_arr =np.array([0,1,2,3,4,5,6,7,8,9])
-# #             )
-
-# pdf.add_bin(center_arr =np.array([0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,9.5]), 
-#             width_arr =np.array([1]*9), 
-#             height_arr =np.array([0.00061674,0.00689466,0.00428099,0.00240142,0.00349404,0.00377796,0.00668253,0.01719828,0.01565921])
-#             )
-# pdf.add_bin(center_arr =np.array([8.05,8.15,8.25,8.35,8.45,8.55,8.65,8.75,8.85,8.95]), 
-#             width_arr =np.array([0.1]*10), 
-#             height_arr =np.array([0.03162489,0.03137879,0.04530057,0.083974,0.11750073,0.27749962,0.99931455,1.476891,5.4022436,0.92421484])
-#             )
-# pdf.normalize()
-# pdf.compute_stats()
-
-# pdf.plot(log_scale=True)
