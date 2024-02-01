@@ -1,4 +1,4 @@
-from data.serialize import serialize_arr, SerializerSettings
+from utils.serialize import serialize_arr, SerializerSettings
 import openai
 import tiktoken
 import numpy as np

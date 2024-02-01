@@ -1,18 +1,12 @@
-# conda create -n llmtime python=3.9
-# conda activate llmtime
+conda create -n LLMICL python=3.9
+conda activate LLMICL
 pip install numpy
-pip install -U jax[cpu] # we don't need GPU for jax
 pip install torch --index-url https://download.pytorch.org/whl/cu118
 pip install openai 
 pip install tiktoken
 pip install tqdm
 pip install matplotlib
 pip install "pandas<2.0.0"
-pip install darts
-pip install gpytorch
 pip install transformers
-pip install datasets
 pip install multiprocess
-# conda deactivate llmtime
-
-# openAI_Key: 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
+# conda deactivate LLMICL
