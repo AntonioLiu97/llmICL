@@ -4,9 +4,9 @@
 
 
 ## Overview
-This repository contains official implementation of the paper 
+This repository contains official implementation of the paper:
 
-     LLMs learn governing principles of dynamical systems, revealing an in-context neural scaling law.
+   [LLMs learn governing principles of dynamical systems, revealing an in-context neural scaling law](http://arxiv.org/abs/2402.00795)
 
 It contains code and data necessary to reproduce the experiments and generate the figures presented in the paper. Some of our data processing routine is adapted from [llmtime](https://github.com/ngruver/llmtime).
 
