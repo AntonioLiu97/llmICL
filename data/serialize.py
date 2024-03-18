@@ -97,6 +97,7 @@ class SerializerSettings:
     fixed_length: bool = False
     max_val: float = 1e7
     time_sep: str = ' ,'
+    # time_sep: str = ';'
     bit_sep: str = ' '
     plus_sign: str = ''
     minus_sign: str = ' -'

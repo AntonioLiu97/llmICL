@@ -1,15 +1,7 @@
-# LLMICL 
+# LLM_PDE
 
-![BM_snapshots](./figures/BM_snapshots.gif)
-
-
-## Overview
-This repository contains official implementation of the paper:
-
-   [LLMs learn governing principles of dynamical systems, revealing an in-context neural scaling law](http://arxiv.org/abs/2402.00795)
-
-It contains code and data necessary to reproduce the experiments and generate the figures presented in the paper. Some of our data processing routine is adapted from [llmtime](https://github.com/ngruver/llmtime).
-
+This repository contains the LLM_PDE branch of the LLMICL project
+![time-concatenated diffusion prediction](./PDF_auto_completion_plot_13b.png)
 ## Directory structure 
 An overview of the repository's structure and contents:
 
@@ -40,11 +32,4 @@ Follow these steps to utilize the repository for generating dynamical system ser
 <p align="center">
   <img src="./figures/ICL_power_law_stochastic.png" width="50%" height="50%">
 </p>
-
-### Authors
-
-- [Toni J.B. Liu](https://antonioliu97.github.io/About_Me.html), jl3499@cornell.edu
-- [Nicolas Boullé](https://nboulle.github.io/), nb690@cam.ac.uk
-- [Raphaël Sarfati](https://raphaelsarfatixyz.wordpress.com/), raphael.sarfati@cornell.edu
-- [Christopher J. Earls](https://earls.cee.cornell.edu/people/), earls@cornell.edu
 

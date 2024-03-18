@@ -408,6 +408,14 @@ class MultiResolutionPDF:
         weighted_PQ_arr = np.sqrt(self.bin_height_arr * Multi_PDF.bin_height_arr) * self.bin_width_arr
         return -np.log(np.sum(weighted_PQ_arr))
     
+    def Hel_dist(self, Multi_PDF):
+        """
+        Calculate the Hellinger distance with another Multi_PDF object
+        """          
+        assert np.all(self.bin_center_arr == Multi_PDF.bin_center_arr), "Only PDFs of the same discretization are comparable"
+        weighted_PQ_arr = np.sqrt(self.bin_height_arr * Multi_PDF.bin_height_arr) * self.bin_width_arr
+        return np.sqrt(2 - 2 * np.sum(weighted_PQ_arr))
+    
     def KL_div(self, Multi_PDF):
         """
         Calculate the KL divergence D_KL(self||Multi_PDF)
@@ -448,7 +456,8 @@ class MultiResolutionPDF:
         if log_scale:
             ax.set_yscale('log')
 
-        ax.legend()
+        if statistic:
+            ax.legend()
 
         # If ax was None, show the plot
         if ax is None:
