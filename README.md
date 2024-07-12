@@ -1,6 +1,7 @@
 # LLMICL 
 
-![BM_snapshots](./figures/BM_snapshots.gif)
+<!-- ![BM_snapshots](./figures/BM_snapshots.gif) -->
+![noisy_logistic_snapshots](./figures/noisy_logistic_map_snapshots.gif)
 
 
 ## Overview
