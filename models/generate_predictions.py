@@ -136,7 +136,7 @@ markov_chain_task = {}
 # Loop through each file in the directory
 for file in generated_series_dir.iterdir():
     # Check if a series is already processed
-    if not (save_path / file.name).exists():\
+    if not (save_path / file.name).exists():
         # Extract the series name from the file name
         series_name = file.stem.rsplit('_', 1)[0]
         # If the series is a continuous series, load the data into the continuous_series_data dictionary
