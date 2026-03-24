@@ -230,9 +230,8 @@ class MultiResolutionPDF:
         if len(self.bin_center_arr) == 0:
             self.add_bin(Multi_PDF.bin_center_arr, Multi_PDF.bin_width_arr, Multi_PDF.bin_height_arr)
         else:    
-            Multi_PDF.normalize()
             assert isinstance(Multi_PDF, MultiResolutionPDF), "Input must be an instance of MultiResolutionPDF"
-            
+            Multi_PDF.normalize()
             self.sort_by_center()
             right_edges = self.bin_center_arr + self.bin_width_arr/2
             insert_index = np.searchsorted(right_edges, Multi_PDF.bin_center_arr.min())
@@ -450,9 +449,9 @@ class MultiResolutionPDF:
 
         ax.legend()
 
-        # If ax was None, show the plot
-        if ax is None:
-            plt.show()
+        # # If ax was None, show the plot
+        # if ax is None:
+        #     plt.show()
 
     def value_at(self, x):
         for center, width, height in zip(self.bin_center_arr, self.bin_width_arr, self.bin_height_arr):
